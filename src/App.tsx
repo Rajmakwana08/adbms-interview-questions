@@ -5045,6 +5045,454 @@ FLOOR(-12.9)  → -13
       `
     },
     {
+      id: 9.9,
+      question: "9. To create triggers on a student table so that whenever we INSERT, UPDATE, or DELETE, the old or new data is automatically copied into another table named Affect.",
+      answer: "",
+      codeExample: `
+✅ 1. Algorithm (Very Easy Steps)
+
+
+Algorithm for BEFORE INSERT Trigger
+
+  When a new record is inserted into student,
+  Before inserting the row,
+  Copy the new values (:NEW) into Affect table.
+
+
+Algorithm for BEFORE DELETE Trigger
+
+  When a record is deleted from student,
+  Before deleting the row,
+  Copy the old values (:OLD) into Affect table.
+
+
+Algorithm for BEFORE UPDATE Trigger
+
+  When a record is updated in student,
+  Before updating the row,
+  Copy the old values (:OLD) into Affect table.
+
+
+✅ 2. PL/SQL Program (Easy & Clean Code)
+
+Step 1: Create student table
+
+CREATE TABLE student (
+    Id INT,
+    Name VARCHAR2(20),
+    Score INT
+);
+
+
+Step 2: Insert sample data
+
+INSERT INTO student VALUES (1, 'Sam', 800);
+INSERT INTO student VALUES (2, 'Ram', 699);
+INSERT INTO student VALUES (3, 'Tom', 250);
+INSERT INTO student VALUES (4, 'Om', 350);
+INSERT INTO student VALUES (5, 'Jay', 750);
+
+
+
+Step 3: Create Affect table
+
+CREATE TABLE Affect (
+    Id INT,
+    Name VARCHAR2(20),
+    Score INT
+);
+
+
+output:
+
+✅ Initial Data in student Table
+
+Before applying any triggers:
+
+| Id | Name | Score |
+| -- | ---- | ----- |
+| 1  | Sam  | 800   |
+| 2  | Ram  | 699   |
+| 3  | Tom  | 250   |
+| 4  | Om   | 350   |
+| 5  | Jay  | 750   |
+
+
+
+Affect
+
+(Empty at the start)
+
+| Id | Name | Score |
+| -- | ---- | ----- |
+| —  | —    | —     |
+
+
+---------------------
+
+
+✅ BEFORE INSERT Trigger
+
+CREATE OR REPLACE TRIGGER trg_before_insert
+BEFORE INSERT ON student
+FOR EACH ROW
+BEGIN
+    INSERT INTO Affect (Id, Name, Score)
+    VALUES (:NEW.Id, :NEW.Name, :NEW.Score);
+END;
+/
+
+
+
+✅ 1. After INSERT Operation
+
+INSERT INTO student VALUES (6, 'Arjun', 500);
+
+Trigger copies NEW row to Affect
+
+
+student
+
+| Id | Name  | Score |
+| -- | ----- | ----- |
+| 1  | Sam   | 800   |
+| 2  | Ram   | 699   |
+| 3  | Tom   | 250   |
+| 4  | Om    | 350   |
+| 5  | Jay   | 750   |
+| 6  | Arjun | 500   |
+
+
+Affect
+| Id | Name  | Score |
+| -- | ----- | ----- |
+| 6  | Arjun | 500   |
+
+
+
+---------------------
+
+
+✅ BEFORE DELETE Trigger
+
+CREATE OR REPLACE TRIGGER trg_before_delete
+BEFORE DELETE ON student
+FOR EACH ROW
+BEGIN
+    INSERT INTO Affect (Id, Name, Score)
+    VALUES (:OLD.Id, :OLD.Name, :OLD.Score);
+END;
+/
+
+
+
+✅ 2. After DELETE Operation
+
+DELETE FROM student WHERE Id = 3;
+
+Trigger copies OLD (deleted) row into Affect.
+Deleted row: (3, Tom, 250)
+
+
+student
+
+| Id | Name  | Score |
+| -- | ----- | ----- |
+| 1  | Sam   | 800   |
+| 2  | Ram   | 699   |
+| 4  | Om    | 350   |
+| 5  | Jay   | 750   |
+| 6  | Arjun | 500   |
+
+
+Affect
+
+| Id | Name  | Score |
+| -- | ----- | ----- |
+| 6  | Arjun | 500   |
+| 3  | Tom   | 250   |
+
+
+---------------------
+
+
+✅ BEFORE UPDATE Trigger
+
+CREATE OR REPLACE TRIGGER trg_before_update
+BEFORE UPDATE ON student
+FOR EACH ROW
+BEGIN
+    INSERT INTO Affect (Id, Name, Score)
+    VALUES (:OLD.Id, :OLD.Name, :OLD.Score);
+END;
+/
+
+
+
+✅ 3. After UPDATE Operation
+
+UPDATE student SET Score = 900 WHERE Id = 5;
+
+
+Old row before update: (5, Jay, 750)
+Trigger inserts old value into Affect.
+
+
+student
+
+| Id | Name  | Score |           |
+| -- | ----- | ----- | --------- |
+| 1  | Sam   | 800   |           |
+| 2  | Ram   | 699   |           |
+| 4  | Om    | 350   |           |
+| 5  | Jay   | 900   | ← Updated |
+| 6  | Arjun | 500   |           |
+
+
+Affect
+
+| Id | Name  | Score |                           |
+| -- | ----- | ----- | ------------------------- |
+| 6  | Arjun | 500   |                           |
+| 3  | Tom   | 250   |                           |
+| 5  | Jay   | 750   | ← Old value before update |
+
+
+
+---------------------
+
+🎉 Final Output
+
+Affect (History Table)
+
+| Id | Name  | Score |
+| -- | ----- | ----- |
+| 6  | Arjun | 500   |
+| 3  | Tom   | 250   |
+| 5  | Jay   | 750   |
+
+
+
+student (Current Data)
+
+| Id | Name  | Score |
+| -- | ----- | ----- |
+| 1  | Sam   | 800   |
+| 2  | Ram   | 699   |
+| 4  | Om    | 350   |
+| 5  | Jay   | 900   |
+| 6  | Arjun | 500   |
+
+
+`
+    },
+    {
+      id: 10.10,
+      question: "10. To create a Package in PL/SQL that contains: Procedure → performs Addition Function → performs Multiplication Then call them in a PL/SQL block and display results.",
+      answer: "", 
+      codeExample: `
+
+✅ Algorithm (Very Simple)
+
+Algorithm for Package
+
+Create a package specification (only declaration):
+
+  Declare a procedure add_numbers(x, y, result OUT)
+  Declare a function multiply_numbers(x, y) RETURN NUMBER
+
+
+Create a package body (implementation):
+
+  Write code for add_numbers
+  Write code for multiply_numbers
+
+
+Write an anonymous PL/SQL block:
+
+  Call add_numbers(5,7, sum_result)
+  Call multiply_numbers(3,4)
+  Display output using DBMS_OUTPUT.PUT_LINE
+
+
+
+✅ PL/SQL Program (Clean & Simple)
+
+1. Package Specification
+
+CREATE OR REPLACE PACKAGE math_operations AS
+    -- Procedure for addition
+    PROCEDURE add_numbers(x NUMBER, y NUMBER, result OUT NUMBER);
+
+    -- Function for multiplication
+    FUNCTION multiply_numbers(x NUMBER, y NUMBER) RETURN NUMBER;
+END math_operations;
+/
+
+
+2. Package Body
+
+CREATE OR REPLACE PACKAGE BODY math_operations AS
+
+    -- Procedure logic
+    PROCEDURE add_numbers(x NUMBER, y NUMBER, result OUT NUMBER) IS
+    BEGIN
+        result := x + y;
+    END add_numbers;
+
+    -- Function logic
+    FUNCTION multiply_numbers(x NUMBER, y NUMBER) RETURN NUMBER IS
+    BEGIN
+        RETURN x * y;
+    END multiply_numbers;
+
+END math_operations;
+/
+
+
+3. Test the Package
+
+DECLARE
+    sum_result NUMBER;
+    product_result NUMBER;
+BEGIN
+    -- Call procedure
+    math_operations.add_numbers(5, 7, sum_result);
+    DBMS_OUTPUT.PUT_LINE('Sum Result: ' || sum_result);
+
+    -- Call function
+    product_result := math_operations.multiply_numbers(3, 4);
+    DBMS_OUTPUT.PUT_LINE('Product Result: ' || product_result);
+END;
+/
+
+
+
+✅ OUTPUT (Easy to Understand Table Form)
+
+Procedure Output (Addition)
+
+| Input X | Input Y | Output (Sum) |
+| ------- | ------- | ------------ |
+| 5       | 7       | 12           |
+
+
+Function Output (Multiplication)
+
+| Input X | Input Y | Output (Product) |
+| ------- | ------- | ---------------- |
+| 3       | 4       | 12               |
+
+
+
+✔ Final DBMS_OUTPUT Screen (What You See)
+
+Sum Result: 12
+Product Result: 12
+
+
+------------------------------------------------------------------------------------
+
+
+✅ What is a PACKAGE in PL/SQL?
+
+👉 A package is a folder (container) that stores related procedures and functions together.
+
+Think like this:
+
+📦 PACKAGE = A folder
+Inside this folder, you keep things that belong to one topic.
+
+Example:
+You can create a package called math_operations
+Inside it, you can keep:
+
+add_numbers()
+subtract_numbers()
+multiply_numbers()
+divide_numbers()
+
+
+📌 Why use a package?
+
+✔ 1. Organizes code
+All related code is kept together.
+
+✔ 2. Easy to manage
+If you want to use math functions, you just call the package.
+
+✔ 3. Better performance
+When package is loaded once, all its procedures/functions stay in memory → faster execution.
+
+✔ 4. Security
+You can hide logic inside package body.
+
+
+
+✅ What is a PROCEDURE?
+
+👉 A procedure is a block of code that performs an action but DOES NOT return a value directly.
+It can give output using OUT parameters.
+
+Example:
+
+  PROCEDURE add_numbers(x NUMBER, y NUMBER, result OUT NUMBER)
+
+
+➡ It performs an operation (addition).
+➡ But it does not return value directly.
+➡ You get the value through the output variable result.
+
+📌 Think:
+Procedure = A function without a return value.
+
+It is used when you want to do something, not calculate and return something.
+
+
+❓ What is "procedural"?
+
+"Procedural" means anything related to procedures.
+When we say procedural programming:
+
+👉 It means writing code in the form of procedures (blocks of instructions).
+
+Example:
+
+Procedures
+Functions
+Code blocks
+
+All are part of procedural programming.
+
+
+🆚 Difference Between Package & Procedure (Easy Table)
+
+| Feature       | PACKAGE                                           | PROCEDURE               |
+| ------------- | ------------------------------------------------- | ----------------------- |
+| Meaning       | A container that stores many procedures/functions | A single block of code  |
+| Returns Value | No                                                | No (uses OUT parameter) |
+| Purpose       | Organize code                                     | Perform a task          |
+| Contains      | Procedures, functions, variables                  | Only code for one task  |
+| Example       | math_operations package                           | add_numbers procedure   |
+
+
+🧠 Simple Real-Life Example
+
+PACKAGE = Folder on your Computer
+Inside you store many files.
+
+PROCEDURE = One file inside the folder
+That file does one specific job.
+      
+      `
+    },
+    {
+      id: 1,
+      question: "",
+      answer: "",
+      codeExample: ``
+    },    
+    {
       id: 1,
       question: "",
       answer: "",
@@ -5055,7 +5503,55 @@ FLOOR(-12.9)  → -13
       question: "",
       answer: "",
       codeExample: ``
-    },    
+    },
+    {
+      id: 1,
+      question: "",
+      answer: "",
+      codeExample: ``
+    },
+    {
+      id: 1,
+      question: "",
+      answer: "",
+      codeExample: ``
+    },
+    {
+      id: 1,
+      question: "",
+      answer: "",
+      codeExample: ``
+    },
+    {
+      id: 1,
+      question: "",
+      answer: "",
+      codeExample: ``
+    },
+    {
+      id: 1,
+      question: "",
+      answer: "",
+      codeExample: ``
+    },
+    {
+      id: 1,
+      question: "",
+      answer: "",
+      codeExample: ``
+    },
+    {
+      id: 1,
+      question: "",
+      answer: "",
+      codeExample: ``
+    },
+    {
+      id: 1,
+      question: "",
+      answer: "",
+      codeExample: ``
+    },
   ];
 
   const toggleQuestion = (id: number) => {
