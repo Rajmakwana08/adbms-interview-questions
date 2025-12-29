@@ -1731,6 +1731,43 @@ When the database restarts:
   So Oracle or DBMS will UNDO (reverse) those changes.
     That means → salary change is canceled and goes back to old value.
 
+
+-------------------------------------
+
+example : 
+
+
+✅ Simple example (SQL)
+
+BEGIN;
+
+INSERT INTO accounts VALUES (1, 1000);
+COMMIT;
+
+CHECKPOINT;
+
+INSERT INTO accounts VALUES (2, 2000);
+
+
+
+✅ What happens here?
+
+First INSERT → data saved using COMMIT
+CHECKPOINT → database writes all saved data to disk
+Second INSERT → not yet safe (no commit)
+
+
+If a crash happens now:
+
+Data before CHECKPOINT is safe ✅
+Data after CHECKPOINT may be lost ❌
+
+
+✅ Exam short answer (you can write this):
+
+Checkpoint is a point where the database saves all committed changes to disk.
+After a crash, the DBMS restarts from the last checkpoint to reduce recovery time.
+
   `},{id:25,question:"25. Differentiate between Backup and Recovery.",answer:"",codeExample:`
 🟩 Difference Between Backup and Recovery
 
